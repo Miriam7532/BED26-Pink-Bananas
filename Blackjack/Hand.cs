@@ -21,16 +21,25 @@ internal sealed class Hand
     private void CalculatePoints()
     {
         int tempPoints = 0;
+        int aceCount = 0;
 
         foreach (var card in _cards)
         {
-            if (card.Rank == "Ace" && tempPoints + card.Value > 21)
+            if (card.Rank == "Ace")
             {
-                tempPoints += 1;
-                continue;
+                aceCount++;
+                tempPoints += 11;
             }
+            else
+            {
+                tempPoints += card.Value;
+            }
+        }
 
-            tempPoints += card.Value;
+        while (tempPoints > 21 && aceCount > 0)
+        {
+            tempPoints -= 10;
+            aceCount--;
         }
 
         Points = tempPoints;
