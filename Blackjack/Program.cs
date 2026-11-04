@@ -1,4 +1,6 @@
 ﻿using System;
+using Blackjack;
+using Blackjack.Game;
 
 class Program
 {
@@ -43,23 +45,70 @@ class Program
     }
 
     static void PlayGameSession(Leaderboard leaderboard)
+{
+    Console.Clear();
+
+    Console.Write("Enter your name: ");
+    string? name = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(name))
     {
-        Console.Clear();
-        Console.Write("Enter your name: ");
-        string name = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(name)) name = "Anonymous";
-
-        int finalBalance = 150;
-        int roundsPlayed = 5;
-
-        Console.WriteLine($"\nGame over for {name}! You finished with {finalBalance} kr after {roundsPlayed} rounds.");
-        
-        leaderboard.AddEntry(name, finalBalance, roundsPlayed);
-
-        Console.WriteLine("Result saved to the leaderboard!");
-        Console.WriteLine("Press any key to return to the menu.");
-        Console.ReadKey();
+        name = "Anonymous";
     }
+
+    Player player = new Player(name);
+    Deck deck = new Deck();
+    Game game = new Game(player, deck);
+
+    bool keepPlaying = true;
+
+    while (keepPlaying && player.Balance > 0)
+    {
+        Console.WriteLine($"\nYour balance: {player.Balance} kr.");
+
+        int bet;
+
+        while (true)
+        {
+            Console.Write($"Enter your bet (1-{player.Balance}): ");
+
+            if (int.TryParse(Console.ReadLine(), out bet)
+                && bet >= 1
+                && bet <= player.Balance)
+            {
+                break;
+            }
+
+            Console.WriteLine("Invalid bet. Please try again.");
+        }
+
+        game.PlayRound(bet);
+
+        if (player.Balance == 0)
+        {
+            Console.WriteLine("You have no money left!");
+            break;
+        }
+
+        Console.Write("\nPlay another round? (y/n): ");
+        keepPlaying = Console.ReadLine()?.Trim().ToLower() == "y";
+    }
+
+    Console.WriteLine(
+        $"\nGame over! {player.Name} finished with " +
+        $"{player.Balance} kr after {player.RoundsPlayed} rounds."
+    );
+
+    leaderboard.AddEntry(
+        player.Name,
+        player.Balance,
+        player.RoundsPlayed
+    );
+
+    Console.WriteLine("Result saved to the leaderboard!");
+    Console.WriteLine("Press any key to return to the menu.");
+    Console.ReadKey();
+}
 
     static void ShowRules()
     {

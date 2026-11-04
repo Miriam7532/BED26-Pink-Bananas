@@ -1,10 +1,7 @@
-using System;
-
 namespace Blackjack;
 
 internal sealed class Dealer
 {
-    private const int maxPoints = 17;
     public Hand Hand { get; private set; }
 
     public Dealer()
@@ -12,11 +9,9 @@ internal sealed class Dealer
         Hand = new Hand();
     }
 
+    // Adds one card to the dealer's hand
     public void Draw(Card card)
     {
-        while (Hand.Points <= maxPoints)
-        {
-            Hand.AddCard(card);
-        }
+        Hand.AddCard(card);
     }
 }
