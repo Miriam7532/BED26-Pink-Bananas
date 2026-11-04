@@ -21,6 +21,7 @@ internal sealed class Game
     {
         _player.Hand.ResetHand();
         _dealer.Hand.ResetHand();
+        _deck.PrepareForNewRound();
 
         Console.WriteLine("\n=== New Blackjack Round ===");
 
