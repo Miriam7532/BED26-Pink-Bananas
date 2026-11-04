@@ -5,6 +5,7 @@ internal sealed class Player
     public string Name { get; private set; }
     public int Balance { get; private set; }
     public Hand Hand { get; private set; }
+    public int RoundsPlayed { get; private set; } = 0;
 
     public Player(string name, int balance = 100)
     {
@@ -34,8 +35,9 @@ internal sealed class Player
         return true;
     }
 
-    public void IncreaseBalance(int amount)
+    public void FinishRound(int amount)
     {
         Balance += amount;
+        RoundsPlayed++;
     }
 }
