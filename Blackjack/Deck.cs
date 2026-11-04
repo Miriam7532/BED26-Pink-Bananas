@@ -19,6 +19,7 @@ public class Deck
     public Deck()
     {
         CreateDeck();
+        Shuffle();
         
     }
 
@@ -48,6 +49,18 @@ public class Deck
     }
 
     // Randomly shuffles the deck
+    public void Shuffle()
+    {
+        for (int i = cards.Count - 1; i > 0; i--)
+        {
+            int j = random.Next(i + 1);
+
+            Card temporary = cards[i];
+            cards[i] = cards[j];
+            cards[j] = temporary;
+        }
+    }
+
    
     // Draws one card from the deck
     public Card DrawCard()
@@ -69,6 +82,7 @@ public class Deck
         if (cards.Count < 15)
         {
             CreateDeck();
+             Shuffle();
             
         }
     }
