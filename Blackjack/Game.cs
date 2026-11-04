@@ -17,34 +17,40 @@ internal sealed class Game
     }
 
     // Starts a new Blackjack round
-    public void PlayRound(int bet)
+  public void PlayRound(int bet)
+{
+    if (!_player.Bet(bet))
     {
-        _player.Hand.ResetHand();
-        _dealer.Hand.ResetHand();
-
-        Console.WriteLine("\n=== New Blackjack Round ===");
-
-        DealInitialCards();
-
-        // Check for Blackjack before normal turns
-        if (CheckBlackjack(bet))
-        {
-            return;
-        }
-
-        PlayerTurn();
-
-        // Player loses immediately if the hand exceeds 21
-        if (_player.Hand.IsBust())
-        {
-            FinishRound(-bet, "You went over 21.", bet);
-            return;
-        }
-
-        DealerTurn();
-
-        DetermineWinner(bet);
+        Console.WriteLine("Invalid bet.");
+        return;
     }
+
+    _deck.PrepareForNewRound();
+
+    _player.Hand.ResetHand();
+    _dealer.Hand.ResetHand();
+
+    Console.WriteLine("\n=== New Blackjack Round ===");
+
+    DealInitialCards();
+
+    if (CheckBlackjack(bet))
+    {
+        return;
+    }
+
+    PlayerTurn();
+
+    if (_player.Hand.IsBust())
+    {
+        FinishRound(0, "You went over 21.", bet);
+        return;
+    }
+
+    DealerTurn();
+
+    DetermineWinner(bet);
+}
 
     // Deals two cards to the player and dealer
     private void DealInitialCards()
