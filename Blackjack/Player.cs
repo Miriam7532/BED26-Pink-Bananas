@@ -20,7 +20,12 @@ internal sealed class Player
 
     public bool Bet(int amount)
     {
-        if (Balance - amount < 0)
+        if (amount <= 0)
+        {
+            return false;
+        }
+
+        if (Balance < amount)
         {
             return false;
         }
