@@ -1,5 +1,3 @@
-using System;
-
 namespace Blackjack;
 
 internal sealed class Player
@@ -18,5 +16,26 @@ internal sealed class Player
     public void Draw(Card card)
     {
         Hand.AddCard(card);
+    }
+
+    public bool Bet(int amount)
+    {
+        if (amount <= 0)
+        {
+            return false;
+        }
+
+        if (Balance < amount)
+        {
+            return false;
+        }
+
+        Balance -= amount;
+        return true;
+    }
+
+    public void IncreaseBalance(int amount)
+    {
+        Balance += amount;
     }
 }
