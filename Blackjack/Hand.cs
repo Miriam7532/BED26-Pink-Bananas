@@ -1,11 +1,9 @@
-using System.Drawing;
-
 namespace Blackjack;
 
 internal sealed class Hand
 {
-    private readonly List<CardPlaceholder> _cards;
-    public IReadOnlyList<CardPlaceholder> Cards => _cards;
+    private readonly List<Card> _cards;
+    public IReadOnlyList<Card> Cards => _cards;
 
     public int Points { get; private set; } = 0;
 
@@ -14,7 +12,7 @@ internal sealed class Hand
         _cards = [];
     }
 
-    public void AddCard(CardPlaceholder card)
+    public void AddCard(Card card)
     {
         _cards.Add(card);
     }
@@ -25,11 +23,11 @@ internal sealed class Hand
 
         foreach (var card in _cards)
         {
-            if (card.IsAce && tempPoints > 21)
-            {
-                tempPoints += 1;
-                continue;
-            }
+            // if (card.Rank == "Ace" && tempPoints > 21)
+            // {
+            //     tempPoints += 1;
+            //     continue;
+            // }
 
             tempPoints += card.Value;
         }
@@ -52,10 +50,4 @@ internal sealed class Hand
         Points = 0;
         _cards.Clear();
     }
-}
-
-internal sealed class CardPlaceholder
-{
-    public int Value { get; set; }
-    public bool IsAce { get; set; }
 }
