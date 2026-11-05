@@ -65,25 +65,37 @@ public class Leaderboard
     }
 
     public void Show()
+{
+    Console.Clear();
+    Console.WriteLine("=== LEADERBOARD ===");
+
+    // Sort by highest balance and show only the top 5
+    var topFive = entries
+        .OrderByDescending(e => e.FinalBalance)
+        .Take(5)
+        .ToList();
+
+    if (topFive.Count == 0)
     {
-        Console.Clear();
-        Console.WriteLine("=== LEADERBOARD ===");
-
-        if (entries.Count == 0)
-        {
-            Console.WriteLine("No results saved yet.");
-        }
-        else
-        {
-            int rank = 1;
-            foreach (var entry in entries)
-            {
-                Console.WriteLine($"{rank}. {entry.Name,-10} {entry.FinalBalance,5} kr   ({entry.RoundsPlayed} rounds)");
-                rank++;
-            }
-        }
-
-        Console.WriteLine("\nPress any key to return to the menu.");
-        Console.ReadKey();
+        Console.WriteLine("No results saved yet.");
     }
+    else
+    {
+        int rank = 1;
+
+        foreach (var entry in topFive)
+        {
+            Console.WriteLine(
+                $"{rank}. {entry.Name,-10} " +
+                $"{entry.FinalBalance,5} kr " +
+                $"({entry.RoundsPlayed} rounds)"
+            );
+
+            rank++;
+        }
+    }
+
+    Console.WriteLine("\nPress any key to return to the menu.");
+    Console.ReadKey();
+}
 }
