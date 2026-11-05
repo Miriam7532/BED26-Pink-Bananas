@@ -6,7 +6,7 @@ class Program
 {
     static void Main(string[] args)
     {
-       Leaderboard leaderboard = new Leaderboard();
+        Leaderboard leaderboard = new Leaderboard();
         bool running = true;
 
         while (running)
@@ -45,70 +45,73 @@ class Program
     }
 
     static void PlayGameSession(Leaderboard leaderboard)
-{
-    Console.Clear();
-
-    Console.Write("Enter your name: ");
-    string? name = Console.ReadLine();
-
-    if (string.IsNullOrWhiteSpace(name))
     {
-        name = "Anonymous";
-    }
+        Console.Clear();
 
-    Player player = new Player(name);
-    Deck deck = new Deck();
-    Game game = new Game(player, deck);
+        Console.Write("Enter your name: ");
+        string? name = Console.ReadLine();
 
-    bool keepPlaying = true;
-
-    while (keepPlaying && player.Balance > 0)
-    {
-        Console.WriteLine($"\nYour balance: {player.Balance} kr.");
-
-        int bet;
-
-        while (true)
+        if (string.IsNullOrWhiteSpace(name))
         {
-            Console.Write($"Enter your bet (1-{player.Balance}): ");
+            name = "Anonymous";
+        }
 
-            if (int.TryParse(Console.ReadLine(), out bet)
-                && bet >= 1
-                && bet <= player.Balance)
+        Player player = new Player(name);
+        Deck deck = new Deck();
+        Game game = new Game(player, deck);
+
+        bool keepPlaying = true;
+
+        while (keepPlaying && player.Balance > 0)
+        {
+            Console.WriteLine($"\nYour balance: {player.Balance} kr.");
+
+            int bet;
+
+            while (true)
             {
+                Console.Write($"Enter your bet (1-{player.Balance}): ");
+
+                if (int.TryParse(Console.ReadLine(), out bet)
+                    && bet >= 1
+                    && bet <= player.Balance)
+                {
+                    break;
+                }
+
+                Console.WriteLine("Invalid bet. Please try again.");
+            }
+
+            if (player.Bet(bet))
+            {
+                game.PlayRound(bet);
+            }
+
+            if (player.Balance == 0)
+            {
+                Console.WriteLine("You have no money left!");
                 break;
             }
 
-            Console.WriteLine("Invalid bet. Please try again.");
+            Console.Write("\nPlay another round? (y/n): ");
+            keepPlaying = Console.ReadLine()?.Trim().ToLower() == "y";
         }
 
-        game.PlayRound(bet);
+        Console.WriteLine(
+            $"\nGame over! {player.Name} finished with " +
+            $"{player.Balance} kr after {player.RoundsPlayed} rounds."
+        );
 
-        if (player.Balance == 0)
-        {
-            Console.WriteLine("You have no money left!");
-            break;
-        }
+        leaderboard.AddEntry(
+            player.Name,
+            player.Balance,
+            player.RoundsPlayed
+        );
 
-        Console.Write("\nPlay another round? (y/n): ");
-        keepPlaying = Console.ReadLine()?.Trim().ToLower() == "y";
+        Console.WriteLine("Result saved to the leaderboard!");
+        Console.WriteLine("Press any key to return to the menu.");
+        Console.ReadKey();
     }
-
-    Console.WriteLine(
-        $"\nGame over! {player.Name} finished with " +
-        $"{player.Balance} kr after {player.RoundsPlayed} rounds."
-    );
-
-    leaderboard.AddEntry(
-        player.Name,
-        player.Balance,
-        player.RoundsPlayed
-    );
-
-    Console.WriteLine("Result saved to the leaderboard!");
-    Console.WriteLine("Press any key to return to the menu.");
-    Console.ReadKey();
-}
 
     static void ShowRules()
     {

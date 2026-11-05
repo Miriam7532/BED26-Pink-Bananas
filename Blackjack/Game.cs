@@ -19,6 +19,7 @@ internal sealed class Game
     // Starts a new Blackjack round
     public void PlayRound(int bet)
     {
+        // Reset hands and prepare the deck
         _player.Hand.ResetHand();
         _dealer.Hand.ResetHand();
         _deck.PrepareForNewRound();
@@ -35,10 +36,10 @@ internal sealed class Game
 
         PlayerTurn();
 
-        // Player loses immediately if the hand exceeds 21
+        // Player loses immediately if their points exceed 21
         if (_player.Hand.IsBust())
         {
-            FinishRound(-bet, "You went over 21.", bet);
+            FinishRound(0, "You went over 21.", bet);
             return;
         }
 
@@ -56,6 +57,7 @@ internal sealed class Game
         _player.Draw(_deck.DrawCard());
         _dealer.Draw(_deck.DrawCard());
 
+        // Show only the dealer's first card
         Console.WriteLine(
             $"\nDealer: {_dealer.Hand.Cards[0]} [?]"
         );
@@ -63,7 +65,7 @@ internal sealed class Game
         PrintHand("You", _player.Hand);
     }
 
-    // Checks for Blackjack
+    // Checks whether the player or dealer has Blackjack
     private bool CheckBlackjack(int bet)
     {
         bool playerBlackjack = _player.Hand.IsBlackjack();
@@ -76,28 +78,31 @@ internal sealed class Game
 
         RevealDealer();
 
+        // Both have Blackjack: return the bet
         if (playerBlackjack && dealerBlackjack)
         {
             FinishRound(
-                0,
+                bet,
                 "Both have Blackjack. It's a tie!",
                 bet
             );
         }
+        // Player has Blackjack: return bet + 1.5x profit
         else if (playerBlackjack)
         {
             int blackjackProfit = bet * 3 / 2;
 
             FinishRound(
-                blackjackProfit,
+                bet + blackjackProfit,
                 "Blackjack! You win!",
                 bet
             );
         }
+        // Dealer has Blackjack: player loses their bet
         else
         {
             FinishRound(
-                -bet,
+                0,
                 "Dealer has Blackjack.",
                 bet
             );
@@ -139,7 +144,7 @@ internal sealed class Game
         }
     }
 
-    // Dealer draws until reaching at least 17
+    // Dealer draws cards until reaching at least 17
     private void DealerTurn()
     {
         RevealDealer();
@@ -165,31 +170,51 @@ internal sealed class Game
         }
     }
 
-    // Determines the winner
+    // Determines the winner of the round
     private void DetermineWinner(int bet)
     {
         int playerPoints = _player.Hand.Points;
         int dealerPoints = _dealer.Hand.Points;
 
+        // Dealer busts: player wins
         if (_dealer.Hand.IsBust())
         {
-            FinishRound(bet, "You win!", bet);
+            FinishRound(
+                bet * 2,
+                "You win!",
+                bet
+            );
         }
+        // Player has more points
         else if (playerPoints > dealerPoints)
         {
-            FinishRound(bet, "You win!", bet);
+            FinishRound(
+                bet * 2,
+                "You win!",
+                bet
+            );
         }
+        // Dealer has more points
         else if (playerPoints < dealerPoints)
         {
-            FinishRound(-bet, "Dealer wins.", bet);
+            FinishRound(
+                0,
+                "Dealer wins.",
+                bet
+            );
         }
+        // Equal points: return the bet
         else
         {
-            FinishRound(0, "It's a tie!", bet);
+            FinishRound(
+                bet,
+                "It's a tie!",
+                bet
+            );
         }
     }
 
-    // Reveals the dealer's cards
+    // Reveals the dealer's complete hand
     private void RevealDealer()
     {
         PrintHand("Dealer", _dealer.Hand);
@@ -203,14 +228,18 @@ internal sealed class Game
         );
     }
 
-    // Updates the player's balance after a round
-    private void FinishRound(int change, string message, int bet)
+    // Updates balance and displays the result
+    private void FinishRound(int payout, string message, int bet)
     {
-        _player.FinishRound(change);
+        // The bet has already been deducted by Player.Bet()
+        _player.FinishRound(payout);
 
-        string details = change > 0
-            ? $"Profit: {change} kr."
-            : change < 0
+        // Calculate profit or loss relative to the original bet
+        int profit = payout - bet;
+
+        string details = profit > 0
+            ? $"Profit: {profit} kr."
+            : profit < 0
                 ? $"Loss: {bet} kr."
                 : "Bet returned.";
 
